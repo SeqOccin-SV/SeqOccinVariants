@@ -136,7 +136,7 @@ rule all:
 	'''
 	input:
 	# do not get the default rule thingy
-		expand("calling/{sample}-pbmm2-{tools}.vcf.gz", sample=samples.index, tools=tools_list)
+		expand("calling/{sample}-pbmm2-{tools}.vcf.gz.tbi", sample=samples.index, tools=tools_list)
 
 # Could add a rule to produce an index for reference 
 # Test if it improves computation time
@@ -329,7 +329,7 @@ elif (config['datatype'] == 'CCS'):
 			bai = get_bai,
 			stats = "mapping/{sample}-pbmm2.bam.stats"
 		output:
-			"calling/{sample}-pbmm2-dv.vcf"
+			"calling/{sample}-pbmm2-dv.vcf.gz"
 		log:
 			"logs/deepvariant/{sample}.log"
 		# ~ container:
@@ -353,7 +353,9 @@ else:
 
 ### VCF Handling
 
-rule tabix:
+ruleorder: compress_tabix > tabix
+
+rule compress_tabix:
 	input:
 		"calling/{file}.vcf"
 	output:
@@ -367,3 +369,16 @@ rule tabix:
 	shell:
 		"bgzip {input}"
 		"tabix {output.zip}"
+
+rule tabix:
+	input:
+		"calling/{file}.vcf.gz"
+	output:
+		idx = "calling/{file}.vcf.gz.tbi"
+	log:
+		"logs/tabix/{file}.log"
+	conda:
+		'envs/tabix_env.yaml'
+	threads: 1
+	shell:
+		"tabix {input}"

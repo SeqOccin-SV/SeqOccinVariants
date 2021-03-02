@@ -8,4 +8,4 @@ samples: 'samples.tsv'
 
 # Datatype in the sample file. Either 'CLR' or 'CCS'
 # Any other value will disable SNP calling
-datatype: 
+datatype: 'CCS' 
