@@ -1,4 +1,11 @@
 # Path to reference genome fasta file
 ref: '/work/project/seqoccin/data/species/bos_taurus/ARS-UCD1.2/refdata-GCA_002263795.2_ARS-UCD1.2_genomic.ensemblchrnames.onlychr/fasta/genome.fa'
-# Sample file. Either subreads.bam or fastq file of PacBio reads
+
+# Sample tsv file. Is composed of two columns, sample and either path or bam_path.
+# path accept sequence files of PacBio reads separated by comma in the following format: subreads.bam, fastq, fq.gz, ccs.bam
+# bam_accept a bam file previously produce by pbmm2
 samples: 'samples.tsv'
+
+# Datatype in the sample file. Either 'CLR' or 'CCS'
+# Any other value will disable SNP calling
+datatype: 

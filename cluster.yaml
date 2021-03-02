@@ -22,3 +22,9 @@ pbsv_call:
 longshot:
   mem: 80
   threads: 12
+
+deepvariant:
+  mem: 120
+  threads: 20
+  partition: 'unlimitq'
+  time: '6-00:00:00'

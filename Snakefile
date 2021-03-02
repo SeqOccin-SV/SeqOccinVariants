@@ -123,12 +123,20 @@ def get_fofn_types(fofn_file):
 ### Rules
 ###############################################################
 
+tools_list = list()
+if (config['datatype'] == 'CLR'):
+	tools_list=['longshot','pbsv']
+elif (config['datatype'] == 'CCS'):
+	tools_list=['dv','pbsv']
+else:
+	tools_list=['pbsv']
+
 rule all:
 	''' Generic all rule to launch the full pipeline
 	'''
 	input:
 	# do not get the default rule thingy
-		expand("calling/{sample}-pbmm2-{tools}.vcf.gz", sample=samples.index, tools=['longshot','pbsv'])
+		expand("calling/{sample}-pbmm2-{tools}.vcf.gz", sample=samples.index, tools=tools_list)
 
 # Could add a rule to produce an index for reference 
 # Test if it improves computation time
@@ -289,30 +297,58 @@ rule pbsv_call:
 
 ### SNP Calling
 
-rule longshot:
-	''' SNP calling for CLR data 
-	'''
-	input:
-		bam = get_bam,
-		bai = get_bai,
-		stats = "mapping/{sample}-pbmm2.bam.stats"
-	output:
-		"calling/{sample}-pbmm2-longshot.vcf"
-	log:
-		"logs/longshot/{sample}.log"
-	conda:
-		'envs/longshot_env.yaml'
-	threads: get_threads('pbsv_discover',10)
-	shell:
-		"longshot --ref {config[ref]}"
-		"--bam {input.bam} "
-		"--out {output} "
-		"2> {log}"
+if (config['datatype'] == 'CLR'):
 
-rule deepvariant:
-	''' SNP calling for HiFi data
-	'''
-	
+	rule longshot:
+		''' SNP calling for CLR data 
+		'''
+		input:
+			bam = get_bam,
+			bai = get_bai,
+			stats = "mapping/{sample}-pbmm2.bam.stats"
+		output:
+			"calling/{sample}-pbmm2-longshot.vcf"
+		log:
+			"logs/longshot/{sample}.log"
+		conda:
+			'envs/longshot_env.yaml'
+		threads: get_threads('pbsv_discover',10)
+		shell:
+			"longshot --ref {config[ref]}"
+			"--bam {input.bam} "
+			"--out {output} "
+			"2> {log}"
+
+elif (config['datatype'] == 'CCS'):
+
+	rule deepvariant:
+		''' SNP calling for HiFi data
+		'''
+		input:
+			bam = get_bam,
+			bai = get_bai,
+			stats = "mapping/{sample}-pbmm2.bam.stats"
+		output:
+			"calling/{sample}-pbmm2-dv.vcf"
+		log:
+			"logs/deepvariant/{sample}.log"
+		# ~ container:
+			# ~ 'docker://google/deepvariant:1.0.0'
+		envmodules:
+			"system/singularity-3.5.3"
+		threads: get_threads('deepvariant',20)
+		shell:
+			"""
+			singularity exec -B /usr/bin/locale:/usr/bin/locale,/work/project/seqoccin:/work/project/seqoccin \
+			-W ./ docker://google/deepvariant:1.0.0 \
+			/opt/deepvariant/bin/run_deepvariant --model_type=PACBIO \
+			--ref={config[ref]} \
+			--reads={input.bam} \
+			--output_vcf={output} \
+			--num_shards={threads}
+			"""
+else:
+	print('No SNPs calling')
 
 
 ### VCF Handling
