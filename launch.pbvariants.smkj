@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# TODO
+# Add options for dry-run, local or cluster launch
+# Update cluster-config to profile
+
+
+
+if [ $# -ne 0 ]
+then
+	echo 'USAGE: launch.pbvariants.smkj'
+	exit 1
+fi
+
+
+snakemake -j 6 --cluster-config cluster.yaml \
+	--cluster "sbatch -c {cluster.threads} -p {cluster.partition} --mem={cluster.mem}G -J {cluster.name}" \
+	--configfile config.yaml \
+	--use-conda -p

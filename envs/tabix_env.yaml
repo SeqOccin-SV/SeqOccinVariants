@@ -1,0 +1,5 @@
+name: tabix
+channels:
+  - bioconda
+dependencies:
+  - htslib=1.11

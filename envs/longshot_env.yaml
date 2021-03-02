@@ -1,0 +1,5 @@
+name: longshot
+channels:
+  - bioconda
+dependencies:
+  - longshot=0.4.1

@@ -1,0 +1,24 @@
+__default__:
+  mem: 8
+  threads: 4
+  partition: 'workq'
+  name: "{rule}.{wildcards}"
+  time: "24:00:00"
+  output: "logs/cluster/{rule}.{wildcards}.out"
+  error: "logs/cluster/{rule}.{wildcards}.err"
+
+pbmm2:
+  mem: 80
+  threads: 20
+
+pbsv_discover:
+  mem: 40
+  threads: 8
+
+pbsv_call:
+  mem: 50
+  threads: 10
+
+longshot:
+  mem: 80
+  threads: 12

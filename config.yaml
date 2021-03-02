@@ -1,0 +1,4 @@
+# Path to reference genome fasta file
+ref: '/work/project/seqoccin/data/species/bos_taurus/ARS-UCD1.2/refdata-GCA_002263795.2_ARS-UCD1.2_genomic.ensemblchrnames.onlychr/fasta/genome.fa'
+# Sample file. Either subreads.bam or fastq file of PacBio reads
+samples: 'samples.tsv'
