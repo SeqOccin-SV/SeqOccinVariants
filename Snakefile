@@ -314,7 +314,7 @@ if (config['datatype'] == 'CLR'):
 			'envs/longshot_env.yaml'
 		threads: get_threads('pbsv_discover',10)
 		shell:
-			"longshot --ref {config[ref]}"
+			"longshot --ref {config[ref]} "
 			"--bam {input.bam} "
 			"--out {output} "
 			"2> {log}"
