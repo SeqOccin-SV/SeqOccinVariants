@@ -367,7 +367,7 @@ rule compress_tabix:
 		'envs/tabix_env.yaml'
 	threads: 1
 	shell:
-		"bgzip {input}"
+		"bgzip {input}; "
 		"tabix {output.zip}"
 
 rule tabix:
