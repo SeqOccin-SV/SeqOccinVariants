@@ -12,15 +12,15 @@ pbmm2:
   threads: 20
 
 pbsv_discover:
-  mem: 40
-  threads: 8
-
-pbsv_call:
-  mem: 50
+  mem: 80
   threads: 10
 
+pbsv_call:
+  mem: 120
+  threads: 12
+
 longshot:
-  mem: 80
+  mem: 120
   threads: 12
 
 deepvariant:

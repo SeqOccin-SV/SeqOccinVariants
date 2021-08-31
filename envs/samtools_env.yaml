@@ -1,0 +1,5 @@
+name: samtools-snake
+channels:
+  - bioconda
+dependencies:
+  - samtools=1.12
