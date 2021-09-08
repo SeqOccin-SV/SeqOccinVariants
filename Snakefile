@@ -81,7 +81,7 @@ def write_fofn(wildcards):
 		if (suffixSet[0].endswith('subreads.bam')):
 			fofnName = 'fofn/'+wildcards.sample+'_subreads.fofn'
 			type = 1
-		elif (suffixSet[0].endswith('ccs.bam')):
+		elif (suffixSet[0].endswith('ccs.bam') or suffixSet[0].endswith('reads.bam')):
 			fofnName = 'fofn/'+wildcards.sample+'_bamccs.fofn'
 			type = 2
 		elif (suffixSet[0].endswith('fastq.gz') or suffixSet[0].endswith('fq.gz') or suffixSet[0].endswith('fastq') or suffixSet[0].endswith('fq')):
