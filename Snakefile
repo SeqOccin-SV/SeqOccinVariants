@@ -60,40 +60,42 @@ def get_threads(rule, default):
 	else:
 		return default
 	
-def write_fofn(wildcards):
-	''' write a fofn file based on samples.txt information
-	the file is named depending on submitted datatypes for CLR and CCS differentiation
-	'''
-	# ~ pprint('in Write_fofn')
-	
-	files = get_files(wildcards)
-	fofnName = ''
-	type = 0
-	suffixes = map(get_suffix, files)
-	suffixSet = list(set(suffixes))
-	
-	pathlib.Path("fofn").mkdir(parents=True, exist_ok=True)
-	
-	if (len(suffixSet) > 1):
-		raise Exception('''You got several datatypes for sample {}. 
-	You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
-	else:
-		if (suffixSet[0].endswith('subreads.bam')):
-			fofnName = 'fofn/'+wildcards.sample+'_subreads.fofn'
-			type = 1
-		elif (suffixSet[0].endswith('ccs.bam') or suffixSet[0].endswith('reads.bam')):
-			fofnName = 'fofn/'+wildcards.sample+'_bamccs.fofn'
-			type = 2
-		elif (suffixSet[0].endswith('fastq.gz') or suffixSet[0].endswith('fq.gz') or suffixSet[0].endswith('fastq') or suffixSet[0].endswith('fq')):
-			fofnName = 'fofn/'+wildcards.sample+'_fastqccs.fofn'
-			type = 3
-	
-	with open(fofnName, 'w') as fh:
-		for f in files:
-			fh.write(f+"\n")
-			
-	return(fofnName)
-
+# def write_fofn(wildcards):
+# 	''' write a fofn file based on samples.txt information
+# 	the file is named depending on submitted datatypes for CLR and CCS differentiation
+# 	'''
+# 	pprint('in Write_fofn')
+# 	
+# 	files = get_files(wildcards)
+# 	fofnName = ''
+# 	type = 0
+# 	suffixes = map(get_suffix, files)
+# 	pprint(suffixes)
+# 	suffixSet = list(set(suffixes))
+# 	pprint(suffixSet)
+# 	
+# 	pathlib.Path("fofn").mkdir(parents=True, exist_ok=True)
+# 	
+# 	if (len(suffixSet) > 4):
+# 		raise Exception('''You got too many datatypes for sample {}. 
+# 	You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
+# 	else:
+# 		if (suffixSet[0].endswith('subreads.bam')):
+# 			fofnName = 'fofn/'+wildcards.sample+'_subreads.fofn'
+# 			type = 1
+# 		elif (suffixSet[0].endswith('ccs.bam') or suffixSet[0].endswith('reads.bam')):
+# 			fofnName = 'fofn/'+wildcards.sample+'_bamccs.fofn'
+# 			type = 2
+# 		elif (suffixSet[0].endswith('fastq.gz') or suffixSet[0].endswith('fq.gz') or suffixSet[0].endswith('fastq') or suffixSet[0].endswith('fq')):
+# 			fofnName = 'fofn/'+wildcards.sample+'_fastqccs.fofn'
+# 			type = 3
+# 	
+# 	with open(fofnName, 'w') as fh:
+# 		for f in files:
+# 			fh.write(f+"\n")
+# 			
+# 	return(fofnName)
+# 
 def get_fofn_types(fofn_file):
 	
 	pprint('Inside get_fofn_types')
@@ -159,14 +161,14 @@ rule write_fofn:
 		
 		pathlib.Path("fofn").mkdir(parents=True, exist_ok=True)
 		
-		if (len(suffixSet) > 1):
-			raise Exception('''You got several datatypes for sample {}. 
-		You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
-		else:
-			fofnName = 'fofn/'+wildcards.sample+'.fofn'
-			with open(fofnName, 'w') as fh:
-				for f in files:
-					fh.write(f+"\n")
+		# if (len(suffixSet) > 4):
+		# 	raise Exception('''You got several datatypes for sample {}. 
+		# You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
+		# else:
+		fofnName = 'fofn/'+wildcards.sample+'.fofn'
+		with open(fofnName, 'w') as fh:
+			for f in files:
+				fh.write(f+"\n")
 
 rule pbmm2:
 	''' rule to align reads with minimap2 wrapper from fastq file
