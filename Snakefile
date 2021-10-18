@@ -289,9 +289,9 @@ rule pbsv_call:
 		"bench/{sample}.pbsvCall.benchmark.txt"
 	conda:
 		'envs/pbsv_env.yaml'
-	threads: get_threads('pbsv_call',10)
+	threads: get_threads('pbsv_call',20)
 	shell:
-		"pbsv call -j {threads} --max-ins-length 100000 --max-dup-length 100000 "+config['ref']+" {input} {output}"
+		"pbsv call -j {threads} --max-ins-length "+config['max-length']+" --max-dup-length "+config['max-length']+" "+config['ref']+" {input} {output}"
                 # specific parameter for CCS, easier to consider a SV" --ccs"
 		# will not implemented it for now as it is usefull mainly for low cov
 		" 2> {log}"

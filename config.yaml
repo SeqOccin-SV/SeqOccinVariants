@@ -1,5 +1,5 @@
 # Path to reference genome fasta file
-ref: '/work/project/seqoccin/data/species/zea_mays/B73/Zea_mays.B73_RefGen_v4.dna.toplevel.fa'
+ref: '/work/project/seqoccin/data/species/bos_taurus/ARS-UCD1.2/ARS-UCD1.2_Btau5.0.1Y.fa'
 
 # Sample tsv file. Is composed of two columns, sample and either path or bam_path.
 # path accept sequence files of PacBio reads separated by comma in the following format: subreads.bam, fastq, fq.gz, ccs.bam
@@ -8,4 +8,8 @@ samples: 'samples.tsv'
 
 # Datatype in the sample file. Either 'CLR' or 'CCS'
 # Any other value will disable SNP calling
-datatype: 'CCS' 
+datatype: 'CLR' 
+
+# Max length for insertion and duplication calling
+# pbsv call default is 10k
+max-length: 100000
