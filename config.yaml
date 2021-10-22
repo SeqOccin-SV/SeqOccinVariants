@@ -8,8 +8,12 @@ samples: 'samples.tsv'
 
 # Datatype in the sample file. Either 'CLR' or 'CCS'
 # Any other value will disable SNP calling
-datatype: 'CLR' 
+datatype: 'CCS' 
 
 # Max length for insertion and duplication calling
 # pbsv call default is 10k
 max-length: 100000
+
+# Annotation, if present use the faste file to annotate SV
+# A new INFO filed called SVANN will contain the fasta ID if there is a match
+# annotation: 'annotation.fasta'

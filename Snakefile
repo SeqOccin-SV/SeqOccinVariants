@@ -283,6 +283,7 @@ rule pbsv_call:
 		#type = rules.pbmm2.params.type
 	params:
 		#is_ccs = lambda wildcards, resources: '--ccs' if resources.type==2 or resources.type==3 else '',
+		has_annotation = lambda wildcards, resources: '--annotations '+config['annotation'] if 'annotation' in config else ''
 	log:
 		"logs/pbsv/{sample}_call.log"
 	benchmark:
@@ -291,7 +292,8 @@ rule pbsv_call:
 		'envs/pbsv_env.yaml'
 	threads: get_threads('pbsv_call',20)
 	shell:
-		"pbsv call -j {threads} --max-ins-length "+str(config['max-length'])+" --max-dup-length "+str(config['max-length'])+" "+config['ref']+" {input} {output}"
+		"pbsv call -j {threads} --max-ins-length "+str(config['max-length'])+" --max-dup-length "+str(config['max-length'])+
+		"{params.has_annotation} "+config['ref']+" {input} {output}"
                 # specific parameter for CCS, easier to consider a SV" --ccs"
 		# will not implemented it for now as it is usefull mainly for low cov
 		" 2> {log}"
