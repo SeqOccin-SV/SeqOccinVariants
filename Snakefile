@@ -293,7 +293,7 @@ rule pbsv_call:
 	threads: get_threads('pbsv_call',20)
 	shell:
 		"pbsv call -j {threads} --max-ins-length "+str(config['max-length'])+" --max-dup-length "+str(config['max-length'])+
-		"{params.has_annotation} "+config['ref']+" {input} {output}"
+		" {params.has_annotation} "+config['ref']+" {input} {output}"
                 # specific parameter for CCS, easier to consider a SV" --ccs"
 		# will not implemented it for now as it is usefull mainly for low cov
 		" 2> {log}"
