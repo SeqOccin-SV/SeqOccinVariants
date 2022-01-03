@@ -333,7 +333,8 @@ elif (config['datatype'] == 'CCS'):
 			bai = get_bai,
 			stats = "mapping/{sample}-pbmm2.bam.stats"
 		output:
-			"calling/{sample}-pbmm2-dv.vcf.gz"
+			vcf = "calling/{sample}-pbmm2-dv.vcf.gz",
+			gvcf = "calling/{sample}-pbmm2-dv.gvcf.gz"
 		log:
 			"logs/deepvariant/{sample}.log"
 		# ~ container:
@@ -344,11 +345,13 @@ elif (config['datatype'] == 'CCS'):
 		shell:
 			"""
 			singularity exec -B /usr/bin/locale:/usr/bin/locale,/work/project/seqoccin:/work/project/seqoccin \
-			-W ./ docker://google/deepvariant:1.0.0 \
+			-W ./ docker://google/deepvariant:1.3.0 \
 			/opt/deepvariant/bin/run_deepvariant --model_type=PACBIO \
 			--ref={config[ref]} \
 			--reads={input.bam} \
-			--output_vcf={output} \
+			--output_vcf={output.vcf} \
+			--output_gvcf={output.gvcf} \
+			--sample_name={wildcards.sample} \
 			--num_shards={threads}
 			"""
 else:
