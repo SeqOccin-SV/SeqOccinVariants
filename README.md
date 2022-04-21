@@ -59,6 +59,6 @@ sbatch -c 1 -p workq -J pbv --mail-type=END,FAIL ./launch.pbvariants.smkj
 
 If some jobs are failing, you will probably have to modify the content of the ```cluster.yaml``` to ask for more ressources.
 
-If you believe the total job duration can exceed 4 days, use **-p unlimitq** or launch it on frontal, it spends most of it's time waiting and doesn't need much resources (see nohup bash command).
+If you believe the total job duration can exceed 4 days, use **-p unlimitq** or launch it on frontal, it spends most of it's time waiting and doesn't need much resources (see nohup bash command for background run).
 
 ./launch.pbvariants.smkj -h will give a description of the options that are available. The option -u might be required if the run failed and was killed (out of memory, time limit exceeded) and has to be restarted.
