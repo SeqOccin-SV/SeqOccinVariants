@@ -1,7 +1,8 @@
 name: pbsv-snake
 channels:
   - bioconda
+  - conda-forge
 dependencies:
   - pbmm2=1.4.0
-  - pbsv=2.6.2
+  - pbsv=2.8.0
   - pandas=1.1.3
