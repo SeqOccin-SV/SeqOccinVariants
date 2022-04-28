@@ -5,6 +5,7 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as Ticker
 import os
 from pretty_html_table import build_table
 import seaborn as sns
@@ -286,7 +287,8 @@ def hist_draw(df, ax, col) :
     if max_cap > 0 :
         ax.set_ylim([0, max_cap])
     ax.set_title(col, fontsize=18)
-    # ax.set_xticklabels(df['name'], rotation=45, ha='right')
+    ax.xaxis.set_major_locator(Ticker.FixedLocator([x+0.5 for x in list(range(0, len(df['name'])))]))
+    ax.set_xticklabels(df['name'], rotation=45, ha='right')
 
 
 def pbsv_graphs(dic, png = 'pbsv_stats.png') :
@@ -297,7 +299,7 @@ def pbsv_graphs(dic, png = 'pbsv_stats.png') :
     df['SV'] = df[['BND', 'DEL', 'INS', 'INV', 'SPLIT']].sum(axis = 1)
     data.append('SV')
     axs = ['ax1', 'ax2', 'ax3', 'ax4', 'ax5', 'ax6']
-    fig, ((axs[0], axs[1]), (axs[2], axs[3]), (axs[4], axs[5])) = plt.subplots(3,2, constrained_layout=True, figsize=(12,6))
+    fig, ((axs[0], axs[1]), (axs[2], axs[3]), (axs[4], axs[5])) = plt.subplots(3,2, constrained_layout=True, figsize=(12,10))
     for i in range(0, len(data)) :
         hist_draw(df, axs[i], data[i])
     # plt.tight_layout()
@@ -321,7 +323,7 @@ def parse_longshot_for_table(files) :
 
 
 def draw_variantsizes(file, ax, title = 'Insertion and Deletion size distribution') :
-    df = pd.read_csv(file, sep='\t')
+    df = pd.read_csv(file, sep='\t', dtype={'chrom' : str})
     df_INS = df[df['svtype'] == 'INS'][['svtype', 'size']]
     df_DEL = df[df['svtype'] == 'DEL'][['svtype', 'size']]
 
