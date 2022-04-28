@@ -3,9 +3,9 @@
 
 # ref = '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
 import pandas as pd
-import pathlib
 from pprint import pprint
 from pathlib import Path
+# import pathlib
 
 ###############################################################
 ### Methods
@@ -66,7 +66,8 @@ def get_bai(wildcards):
 
 # Return path file suffixes
 def get_suffix(string):
-	return(''.join(pathlib.Path(string).suffixes))
+	return(''.join(Path(string).suffixes))
+	# return(''.join(pathlib.Path(string).suffixes))
 
 
 def get_threads(rule, default):
