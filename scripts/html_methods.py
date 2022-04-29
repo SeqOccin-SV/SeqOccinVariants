@@ -256,7 +256,7 @@ def png_to_base64txt(png, txt = None) :
 
 # Creat a color scaling depending on the number of individuals for plotting.
 def color_scaling(column_length) :
-    colors = [(0,0,1)]
+    colors = []
     nbG = 0
     nbR = 0
     if column_length%2 != 0 :
@@ -269,10 +269,10 @@ def color_scaling(column_length) :
     b = 1
     incr = 1/column_length
     for i in range(0,nbG) :
+        colors.append((r,g,b))
         r += incr
         b -= incr
         g += incr*2
-        colors.append((r,g,b))
     for i in range(0,nbR) :
         r += incr
         b -= incr
