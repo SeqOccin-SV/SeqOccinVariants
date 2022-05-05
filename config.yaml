@@ -1,6 +1,6 @@
 # Path to reference genome fasta file
-# This directory must also contain the fasta index file for the reference (reference_genome.fa.fai)
-ref: 'path/to/reference_genome.fa'
+ref: '/home/quentinboone/Bureau/data/other/goat_genome.fa'
+# ref: '/work/project/seqoccin/svdetection/test_pipeline/q_test/data/goat_genome.fa'
 
 # Sample tsv file. Is composed of two columns, sample and either path or bam_path.
 # path accept sequence files of PacBio reads separated by comma in the following format: subreads.bam, fastq, fq.gz, ccs.bam
@@ -18,7 +18,7 @@ max-length: 20000
 # Path to the directory that will contain the output files.
 # The path is relative to where your snakemake file is by default.
 # if the directory doesn't exist it will be created.
-workdir: 'workdir'
+workdir: '/home/quentinboone/Bureau/v11/goat_test'
 
 # ulimit default is 1024 but can cause samtools sort to crash despite
 # large memory allocations. If samtools sort crashes try giving more memory

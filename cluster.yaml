@@ -42,3 +42,7 @@ svim:
   threads: 12
   time: '4-00:00:00'
   
+get_sequence_numbers:
+  mem: 32
+  threads: 10
+

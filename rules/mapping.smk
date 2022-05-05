@@ -65,7 +65,7 @@ rule minimap:
 	output:
 		bam="mapping/{sample}-{tech}-minimap.bam",
 		bai="mapping/{sample}-{tech}-minimap.bam.bai",
-		flag="mapping/{sample}-{tech}-minimap.bam.flagstat"
+		stats="mapping/{sample}-{tech}-minimap.bam.stats"
 	threads:
 		get_threads("minimap", 12)
 	log:
@@ -73,12 +73,13 @@ rule minimap:
 	conda:
 		'../envs/svim_env.yaml'
 	shell:
+		"ulimit -n {params.ulim}; "
 		"""
 		minimap2 --MD -t {threads} -a {input.minimapindex} {input.reads} | \
 		samtools view -bS | \
 		samtools sort -@{threads} -o {output.bam} 2> {log};
 		"""
-		"samtools flagstat -@{threads} {output.bam} > {output.flag}; "
+		"samtools stats -@{threads} {output.bam} > {output.stats}; "
 		"samtools index {output.bam}"
 
 

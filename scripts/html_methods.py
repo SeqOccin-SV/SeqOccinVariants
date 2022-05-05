@@ -362,9 +362,50 @@ def png_naming(file_name) :
     return "stats/" + file_name.split('/')[-1] + ".png"
 
 
-def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_stats_files, html = "stats/pipeline_output.html") :
+def mapped_reads(seq_cout, indx) :
+    sc = {}
+    with open(seq_cout, 'r') as file :
+        for line in file :
+            if line.split()[0] not in sc.keys() :
+                sc[line.split()[0]] = [int(line.split()[1])]
+            else :
+                sc[line.split()[0]].append(int(line.split()[1]))
+    bam_fofn = {}
+    for k in sc.keys() :
+        sc[k] = sum(sc[k])
+    with open(indx, 'r') as file :
+        for line in file :
+            bam_fofn[line.split()[0]] = line.split()[1]
+    for k in bam_fofn.keys() :
+        bam_fofn[k] = sc[bam_fofn[k]]
+    return bam_fofn
+
+
+def get_mapped_reads(file) :
+    with open(file, 'r') as f:
+        for line in f :
+            if "reads mapped:" in line :
+                return int(line.split()[3])
+    return 0
+
+
+def mapped_coverage_html(dic) :
+    mapped = {'name' : [], 'reads' : [], 'mapped' : [], '% mapped' : []}
+    for k in dic.keys() :
+        mapped['name'].append(get_title(k))
+        mapped['reads'].append(dic[k])
+        mreads = get_mapped_reads(k)
+        mapped['mapped'].append(mreads)
+        mapped['% mapped'].append((mreads/dic[k])*100)
+    return mapped
+
+
+def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_stats_files, number, index, html = "stats/pipeline_output.html") :
     sns.set_theme()
     body = "<h1>PacBio Variants pipeline stats</h1>\n<br><br>"
+
+    mapped = mapped_coverage_html(mapped_reads(number, index))
+    body += html_build_table(mapped, 'Mapped reads')
 
     # Build pbmm2 depth graphs
     bam = get_files_from_file(bam_stats_files) 
@@ -373,7 +414,7 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     txt = png_to_base64txt(png)
     body += html_graph_output(txt, 'Samples pbmm2')
     
-    # get pbsv vcf file data for variant table.
+    # get pbsv vcf file data for variant table
     pbsv = get_files_from_file(pbsv_stats_files)
     dic = parse_vcf_for_table(pbsv)
     body += html_build_table(dic, 'pbsv structural variant stats')
@@ -382,14 +423,14 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     txt = png_to_base64txt(png)
     body += html_graph_output(txt, 'pbsv stats barplots')
 
-    # pbsv insertion & deletion size distribution :
+    # pbsv insertion & deletion size distribution
     variantsizes = get_files_from_file(variantsizes_files)
     png = png_naming(variantsizes_files)
     draw_variantsizes_png(variantsizes, png)
     txt = png_to_base64txt(png)
     body += html_graph_output(txt, 'Insertion Deletion stats')
 
-    # SNP with longshot or deepvariant :
+    # SNP with longshot or deepvariant
     snp = get_files_from_file(snp_stats_files)
     dic_ls = parse_longshot_for_table(snp)
     if snp_stats_files == "stats/SNP_longshot.stats" :
@@ -398,6 +439,7 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
         body += html_build_table(dic_ls, 'deepvariant SNP stats')
 
     write_html(html, body)
+
 
 
 if __name__ == "__main__" :
@@ -409,6 +451,8 @@ if __name__ == "__main__" :
     parser.add_argument("-p", "--pbsv", help = "pbsv stats file list file.", required = True)
     parser.add_argument("-v", "--variants", help = "variants stats file list file.", required = True)
     parser.add_argument("-s", "--snp", help = "snp stats file list file.", required = True)
+    parser.add_argument("-i", "--index", help = "index linking fofn file to bam.stats file.", required = True)
+    parser.add_argument("-n", "--number", help = "number of sequences in each imput file.", required = True)
     parser.add_argument("-t", "--html", help = "html output file.", required = False)
     
     args = parser.parse_args()
@@ -418,7 +462,9 @@ if __name__ == "__main__" :
     if args.html is not None :
         html = args.html
     
-    write_full_html(args.bam, args.pbsv, args.variants, args.snp, args.html)
+    write_full_html(args.bam, args.pbsv, args.variants, args.snp, args.number, args.index, args.html)
+
+    # print(mapped_reads(args.number, args.index))
 
 
 

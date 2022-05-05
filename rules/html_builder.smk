@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+# Groupe all outputs of samtools stats from the pbmm2 output files
 rule bam_stats_for_html:
 	input:
 		expand("mapping/{sample}-{tech}-{mapping}.bam.stats", sample=samples.index, tech=config['datatype'], mapping = get_mapping())
@@ -13,6 +13,7 @@ rule bam_stats_for_html:
 		"echo {input} | tr \" \" \"\\n\" > {output}"
 
 
+# Build stats files from pbsv output files
 rule pbsv_build_stats:
     input:
         "calling/{sample}-{tech}-pbmm2-pbsv.vcf.gz"
@@ -25,6 +26,7 @@ rule pbsv_build_stats:
         bcftools query -f "%ID\n" {input} | cut -f2 -d'.' | sort | uniq -c > {output}
         """
 
+# Groupe pbsv stats output
 rule pbsv_stats_for_html:
     input:
         expand("stats/{sample}-{tech}-pbmm2-pbsv.vcf.stats.txt", sample=samples.index, tech=config['datatype'])
@@ -34,6 +36,7 @@ rule pbsv_stats_for_html:
         "echo {input} | tr \" \" \"\\n\" > {output}"
 
 
+# Calculate variant sizes for each individual
 rule set_variantsizes:
     input:
         "calling/{sample}-{tech}-{mapping}-pbsv.vcf.gz"
@@ -49,6 +52,7 @@ rule set_variantsizes:
         """
 
 
+# Groupe all variant sizes information
 rule variantsizes_for_html:
     input:
         expand("stats/{sample}-{tech}-{mapping}-pbsv.variantsizes.tsv", sample=samples.index, tech=config['datatype'], mapping = get_mapping(), tools=get_tools())
@@ -57,7 +61,8 @@ rule variantsizes_for_html:
     shell:
         "echo {input} | tr \" \" \"\\n\" > {output}"
 
-        
+
+# Build the stats file for the html output from the outputs of longshot or deepvariant (CLR or CCS)        
 if "longshot" in get_tools() :
     rule bcf_stats_longshot:
         input:
@@ -98,16 +103,93 @@ else :
             "echo {input} | tr \" \" \"\\n\" > {output}"
 
 
+
+# Get a file containing a list of impout files to pbmm2 with the number of sequences for each file.
+rule get_sequence_numbers:
+    input:
+        "fofn/{sample}-{tech}.fofn"
+    output:
+        temp("stats/{sample}-{tech}_sequences_count.stats")
+    conda:
+        '../envs/samtools_env.yaml'
+    shell:
+        """
+        for i in `cat {input}`
+        do 
+            sufix=`head -1 {input} | rev | cut -d'.' -f1 | rev`
+            if [ $sufix = \"bam\" ]
+            then
+                echo -e \"{input}\\t`samtools view $i | wc -l`\" >> {output}
+            else
+                echo -e \"{input}\\t`zcat $i | grep -c \"@\"`\" >> {output}
+            fi
+        done
+        """
+
+# # Get a file containing a list of impout files to pbmm2 with the number of sequences for each file.
+# rule get_sequence_numbers:
+#     input:
+#         "fofn/{sample}-{tech}.fofn"
+#     output:
+#         temp("stats/{sample}-{tech}_sequences_count.stats")
+#     conda:
+#         '../envs/samtools_env.yaml'
+#     shell:
+#         """
+#         for i in `cat {input}`
+#         do 
+#             sufix=`head -1 {input} | rev | cut -d'.' -f1 | rev`
+#             if [ $sufix = \"bam\" ]
+#             then
+#                 samtools stats {$i} > stats/${i##/*}.stats
+#                 echo -e "`sed -n '/\\tsequences:/p' $i.stats | cut -f3`\\t`sed -n '/\\tbases mapped:/p' $i.stats | cut -f3`" >> {output}
+#             else
+#                 echo -e \"{input}\\t`zcat $i | grep -c \"@\"`\" >> {output}
+#             fi
+#         done
+#         """
+
+
+rule group_sequence_numbers:
+    input:
+        expand("stats/{sample}-{tech}_sequences_count.stats", sample=samples.index, tech=config['datatype'])
+    output:
+        "stats/sequences_count.stats"
+    shell:
+        "for i in {input}; do cat $i >> {output}; done"
+
+
+# Index fofn file with corresponding sam.stats pbmm2 output file
+rule index_fofn_bamstats:
+    input:
+        fofn = "fofn/{sample}-{tech}.fofn",
+        bam = "mapping/{sample}-{tech}-{mapping}.bam.stats"
+    output:
+        temp("stats/{sample}-{tech}-{mapping}_index.txt")
+    shell:
+        "echo -e \"`pwd`/{input.bam}\\t{input.fofn}\" > {output}"
+
+
+rule group_index_fofn_bamstats:
+    input:
+        expand("stats/{sample}-{tech}-{mapping}_index.txt", sample=samples.index, tech=config['datatype'], mapping = get_mapping())
+    output:
+        "stats/fofn_bamstats_index.txt"
+    shell:
+        "cat {input} > {output}"
+
+
+# rule that calls the rules above to build the html output
 rule build_full_html:
     input:
         bam = "stats/bam_stats_for_html.stats",
         pbsv = "stats/pbsv_stats_for_html.stats",
         variantsizes = "stats/txt_variantsizes.tsv",
-        snp = expand("stats/SNP_{tools}.stats", tools=get_tools()[0])
+        snp = expand("stats/SNP_{tools}.stats", tools=get_tools()[0]),
+        index = "stats/fofn_bamstats_index.txt",
+        number = "stats/sequences_count.stats"
     output:
         "stats/pipeline_output.html"
-    # run:
-        # write_full_html(str(input.bam), str(input.pbsv), str(input.variantsizes), str(input.snp), html = str(output))
     log:
         "logs/stats/pipeline_output.html.log"
     conda:
@@ -115,4 +197,13 @@ rule build_full_html:
     params:
         path = workflow.basedir
     shell:
-        "python3 {params.path}/scripts/html_methods.py -b {input.bam} -p {input.pbsv} -v {input.variantsizes} -s {input.snp} -t {output} 2> {log}"
+        """
+        python3 {params.path}/scripts/html_methods.py \
+        -b {input.bam} \
+        -p {input.pbsv} \
+        -v {input.variantsizes} \
+        -s {input.snp} \
+        -i {input.index} \
+        -n {input.number} \
+        -t {output} 2> {log}
+        """
