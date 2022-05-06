@@ -12,11 +12,13 @@ from pathlib import Path
 ###############################################################
 
 
-#------------------------------------------------------------------------------
-# info : Get tools to use depending on the input data type.
-# return : [str] : List of tools to use depending on the data type.
-#------------------------------------------------------------------------------
 def get_tools() :
+	"""Get tools to use depending on the input data type.
+
+	Return:
+		list : List of tools to use depending on the data type.
+
+	"""
 	if config['datatype'] == 'CLR' :
 		return ['longshot','pbsv']
 	elif config['datatype'] == 'CCS' :
@@ -26,11 +28,13 @@ def get_tools() :
 	return ['pbsv']
 
 
-#------------------------------------------------------------------------------
-# info : Get tools to use depending on the input data type.
-# return : [str] : List of tools to use depending on the data type.
-#------------------------------------------------------------------------------
 def get_mapping() :
+	"""Get tools to use depending on the input data type.
+
+	Return:
+		list: List of tools to use depending on the data type.
+
+	"""
 	if config['datatype'] in ['CLR', 'CCS'] :
 		return 'pbmm2'
 	elif config['datatype'] in ['ONT', 'nanopore'] :
@@ -38,39 +42,44 @@ def get_mapping() :
 	return 'unknown'
 
 
-#------------------------------------------------------------------------------
-# info : Parse the samples.txt from config file.
-# input : obj : object containing all of the snakemake wildcards.
-# return : [str] : list of files path.
-#------------------------------------------------------------------------------
 def get_files(wildcards):
+	"""Parse the samples.txt from config file.
+
+	Args:
+		wildcards (obj): object containing all of the snakemake wildcards.
+	
+	Return:
+		list: list of files path.
+	
+	"""
 	print(wildcards.sample)
 	files = samples.loc[wildcards.sample, 'path'].split(',')
 	return(files)
 
 
-# Shortcut to use bam directly
 def get_bam(wildcards):
+	"""Shortcut to use bam directly."""
 	if 'bam_path' in samples.columns:
 		return samples.loc[wildcards.sample, "bam_path"]
 	#return "mapping/%s-%s-pbmm2.bam" % (wildcards.sample, wildcards.tech)
 	return "mapping/%s-%s-%s.bam" % (wildcards.sample, wildcards.tech, wildcards.mapping)
 
 
-# Shortcut to use bam directly
 def get_bai(wildcards):
+	"""Shortcut to use bam directly."""
 	if 'bam_path' in samples.columns:
 		return samples.loc[wildcards.sample, "bam_path"]+'.bai'
 	return "mapping/%s-%s-pbmm2.bam.bai" % (wildcards.sample, wildcards.tech)
 
 
-# Return path file suffixes
 def get_suffix(string):
+	"""Get the path file suffixes."""
 	return(''.join(Path(string).suffixes))
 	# return(''.join(pathlib.Path(string).suffixes))
 
 
 def get_threads(rule, default):
+	"""Get the default number of threads for a rule."""
 	cluster_config = snakemake.workflow.cluster_config
 	if rule in cluster_config and "threads" in cluster_config[rule]:
 		return cluster_config[rule]["threads"]
@@ -79,13 +88,8 @@ def get_threads(rule, default):
 	return default
 
 
-#------------------------------------------------------------------------------
-# info : Returning memory to allocate in Gigabytes.
-# in : rule (str) : corresponding rule in cluster.yaml.
-# in : default (int) : default amount of total memory in gigabytes.
-# return : (int) : amount of memory to allocate in Gigabytes.
-#------------------------------------------------------------------------------
 def get_mem(rule, default):
+	"""Get memory to allocate in Gigabytes."""
 	cluster_config = snakemake.workflow.cluster_config
 	if rule in cluster_config and "mem" in cluster_config[rule]:
 		return cluster_config[rule]["mem"]
@@ -94,15 +98,12 @@ def get_mem(rule, default):
 	return default
 
 
-#------------------------------------------------------------------------------
-# info : Calculate memory to allocate to each CPU, converting from gigabytes 
-# to megabytes to avoid type errors (float/int) when called by samtools sort.
-# in : rule (str) : corresponding rule in cluster.yaml.
-# in : default (int) : default amount of total memory in gigabytes.
-# in : threads (int) : default number of threads.
-# return : (int) : amount of memory per CPU in Megabytes.
-#------------------------------------------------------------------------------
 def get_mem_per_CPU(rule, default, threads=1):
+	"""Calculate memory to allocate to each CPU
+
+	The memory is converted from Gigabbytes to Megabytes to avoid type errors 
+	(float/int) when called by samtools sort.
+	"""
 	cluster_config = snakemake.workflow.cluster_config
 	if rule in cluster_config and "mem" in cluster_config[rule] and "threads" in cluster_config[rule] :
 		return int((cluster_config[rule]["mem"]/cluster_config[rule]["threads"])*1000)
@@ -112,6 +113,7 @@ def get_mem_per_CPU(rule, default, threads=1):
 
 
 def get_fofn_types(fofn_file):
+	"""Get the type of data (bam/fastq) of the files whose names are in the fofn file."""
 	pprint('Inside get_fofn_types')
 	type = 0
 	with open(str(fofn_file), 'r') as fh:
@@ -124,16 +126,16 @@ def get_fofn_types(fofn_file):
 			type = 2
 		elif (suffix.endswith('fastq.gz') or suffix.endswith('fq.gz') or suffix.endswith('fastq') or suffix.endswith('fq')):
 			type = 3
-	
 	pprint('Type value: '+str(type))
 	return(type)
 
 
-#------------------------------------------------------------------------------
-# Get absolute path to a file from it's relative path.
-# This function has no effect if an absolute path is given.
-#------------------------------------------------------------------------------
 def abs_path(file_name):
+	"""Get absolute path to a file from it's relative path.
+	
+	this function has no effect if an absolute path is given.
+	
+	"""
 	return str(Path(file_name).resolve())
 
 

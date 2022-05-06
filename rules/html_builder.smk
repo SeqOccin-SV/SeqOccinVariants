@@ -104,28 +104,6 @@ else :
 
 
 
-# Get a file containing a list of impout files to pbmm2 with the number of sequences for each file.
-rule get_sequence_numbers:
-    input:
-        "fofn/{sample}-{tech}.fofn"
-    output:
-        temp("stats/{sample}-{tech}_sequences_count.stats")
-    conda:
-        '../envs/samtools_env.yaml'
-    shell:
-        """
-        for i in `cat {input}`
-        do 
-            sufix=`head -1 {input} | rev | cut -d'.' -f1 | rev`
-            if [ $sufix = \"bam\" ]
-            then
-                echo -e \"{input}\\t`samtools view $i | wc -l`\" >> {output}
-            else
-                echo -e \"{input}\\t`zcat $i | grep -c \"@\"`\" >> {output}
-            fi
-        done
-        """
-
 # # Get a file containing a list of impout files to pbmm2 with the number of sequences for each file.
 # rule get_sequence_numbers:
 #     input:
@@ -141,13 +119,40 @@ rule get_sequence_numbers:
 #             sufix=`head -1 {input} | rev | cut -d'.' -f1 | rev`
 #             if [ $sufix = \"bam\" ]
 #             then
-#                 samtools stats {$i} > stats/${i##/*}.stats
-#                 echo -e "`sed -n '/\\tsequences:/p' $i.stats | cut -f3`\\t`sed -n '/\\tbases mapped:/p' $i.stats | cut -f3`" >> {output}
+#                 echo -e \"{input}\\t`samtools view $i | wc -l`\" >> {output}
 #             else
 #                 echo -e \"{input}\\t`zcat $i | grep -c \"@\"`\" >> {output}
 #             fi
 #         done
 #         """
+
+
+
+# Get a file containing a list of impout files to pbmm2 with the number of sequences for each file.
+rule get_sequence_numbers:
+    input:
+        "fofn/{sample}-{tech}.fofn"
+    output:
+        temp("stats/{sample}-{tech}_sequences_count.stats")
+    conda:
+        '../envs/samtools_env.yaml'
+    shell:
+        """
+        for i in `cat {input}`
+        do 
+            sufix=`head -1 {input} | rev | cut -d'.' -f1 | rev`
+            if [ $sufix = \"bam\" ]
+            then
+                echo -e \"{input}\\t`samtools stats $i | \
+                sed -n '/\\tsequences:\\|\\ttotal length:/p' | \
+                cut -f3 | tr \"\\n\" \" \" | sed -e 's/ \+/\\t/g'`\" >> {output}
+            else
+                echo -e \"{input}\\t`seqkit stats $i | \
+                tail -1 | sed -e 's/ \\+ /\\t/g' | \
+                cut -f4,5 | sed -e 's/,//g'`\" >> {output}
+            fi
+        done
+        """
 
 
 rule group_sequence_numbers:
