@@ -61,3 +61,34 @@ rule deepvariant:
 		--num_shards={threads}
 		"""
 
+
+# #PEPPER margin calling for ONT data
+# rule pepper:
+# 	input:
+# 		bam = get_bam,
+# 		bai = get_bai,
+# 		ref = config['ref'],
+# 		stats = "mapping/{sample}-{tech}-minimap.bam.stats"
+# 	wildcard_constraints:
+# 		mapping = "minimap"
+# 	output:
+# 		vcf = "calling/{sample}-{tech}-{mapping}-pepper.vcf.gz"
+# 	params:
+# 		prefix = "calling/{sample}-{tech}-{mapping}-pepper"
+# 	log:
+# 		"logs/pepper/{sample}-{tech}-{mapping}.log"
+# 	envmodules:
+# 		"system/singularity-3.5.3"
+# 	threads: get_threads('deepvariant',20)
+# 	shell:
+# 		"""
+# 		singularity exec --bind /usr/lib/locale:/usr/bin/locale,/work/project/seqoccin:/work/project/seqoccin \
+# 		-W calling/ docker://kishwars/pepper_deepvariant:r0.8 \
+# 		run_pepper_margin_deepvariant call_variant \
+# 		-b {input.bam} \
+# 		-f {input.ref} \
+# 		-o calling \
+# 		-p {params.prefix} \
+# 		-t {threads} \
+# 		--ont_r10_q20
+# 		"""
