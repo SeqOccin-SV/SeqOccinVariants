@@ -36,12 +36,35 @@ rule pbsv_stats_for_html:
         "echo {input} | tr \" \" \"\\n\" > {output}"
 
 
+# Build stats files from svim output files
+rule svim_build_stats:
+    input:
+        "calling/{sample}-{tech}-minimap-svim.vcf.gz"
+    output:
+        "stats/{sample}-{tech}-minimap-svim.vcf.stats.txt"
+    conda:
+        '../envs/html_env.yaml'
+    shell:
+        """
+        bcftools query -f "%ID\n" {input} | cut -f2 -d'.' | sort | uniq -c > {output}
+        """
+
+# Groupe svim stats output
+rule svim_stats_for_html:
+    input:
+        expand("stats/{sample}-{tech}-minimap-svim.vcf.stats.txt", sample=samples.index, tech=config['datatype'])
+    output:
+        "stats/svim_stats_for_html.stats"
+    shell:
+        "echo {input} | tr \" \" \"\\n\" > {output}"
+
+
 # Calculate variant sizes for each individual
 rule set_variantsizes:
     input:
-        "calling/{sample}-{tech}-{mapping}-pbsv.vcf.gz"
+        "calling/{sample}-{tech}-{mapping}-{tools}.vcf.gz"
     output:
-        "stats/{sample}-{tech}-{mapping}-pbsv.variantsizes.tsv"
+        "stats/{sample}-{tech}-{mapping}-{tools}.variantsizes.tsv"
     conda:
         '../envs/html_env.yaml'
     shell:
@@ -55,9 +78,9 @@ rule set_variantsizes:
 # Groupe all variant sizes information
 rule variantsizes_for_html:
     input:
-        expand("stats/{sample}-{tech}-{mapping}-pbsv.variantsizes.tsv", sample=samples.index, tech=config['datatype'], mapping = get_mapping(), tools=get_tools())
+        expand("stats/{sample}-{tech}-{mapping}-{tools}.variantsizes.tsv", sample=samples.index, tech=config['datatype'], mapping = get_mapping(), tools=get_sv_tool())
     output:
-        "stats/txt_variantsizes.tsv"
+        "stats/{tools}_txt_variantsizes.tsv"
     shell:
         "echo {input} | tr \" \" \"\\n\" > {output}"
 
@@ -188,9 +211,9 @@ rule group_index_fofn_bamstats:
 rule build_full_html:
     input:
         bam = "stats/bam_stats_for_html.stats",
-        pbsv = "stats/pbsv_stats_for_html.stats",
-        variantsizes = "stats/txt_variantsizes.tsv",
-        snp = expand("stats/SNP_{tools}.stats", tools=get_tools()[0]),
+        sv = expand("stats/{tools}_stats_for_html.stats", tools=get_sv_tool()),
+        variantsizes = expand("stats/{tools}_txt_variantsizes.tsv", tools=get_sv_tool()),
+        snp = expand("stats/SNP_{tools}.stats", tools=get_snp_tool()),
         index = "stats/fofn_bamstats_index.txt",
         number = "stats/sequences_count.stats"
     output:
@@ -205,7 +228,7 @@ rule build_full_html:
         """
         python3 {params.path}/scripts/html_methods.py \
         -b {input.bam} \
-        -p {input.pbsv} \
+        -p {input.sv} \
         -v {input.variantsizes} \
         -s {input.snp} \
         -i {input.index} \

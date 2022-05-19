@@ -12,6 +12,43 @@ from pathlib import Path
 ###############################################################
 
 
+# def get_tools() :
+# 	"""Get tools to use depending on the input data type.
+
+# 	Return:
+# 		list : List of tools to use depending on the data type.
+
+# 	"""
+# 	if config['datatype'] == 'CLR' :
+# 		return ['longshot','pbsv']
+# 	elif config['datatype'] == 'CCS' :
+# 		return ['dv','pbsv']
+# 	elif config['datatype'] == 'ONT' :
+# 		return ['longshot','svim']
+# 	return ['pbsv']
+
+
+def get_sv_tool() :
+	"""Get the tool used for sv calling depending on data type."""
+	if config['datatype'] in ['CLR', 'CCS', 'hifi'] :
+		return 'pbsv'
+	elif config['datatype'] in ['ONT', 'nanopore'] :
+		return 'svim'
+	return None
+
+
+def get_snp_tool() :
+	"""Get the tool used for snp calling depending on data type."""
+	if config['datatype'] == 'CLR' :
+		return 'longshot'
+	elif config['datatype'] in ['CCS', 'hifi'] :
+		return 'sv'
+	elif config['datatype'] in ['ONT', 'nanopore'] :
+		# This is not grouped with CLR because it should be later changed to pepper
+		return 'longshot'
+	return None
+
+
 def get_tools() :
 	"""Get tools to use depending on the input data type.
 
@@ -19,13 +56,7 @@ def get_tools() :
 		list : List of tools to use depending on the data type.
 
 	"""
-	if config['datatype'] == 'CLR' :
-		return ['longshot','pbsv']
-	elif config['datatype'] == 'CCS' :
-		return ['dv','pbsv']
-	elif config['datatype'] == 'ONT' :
-		return ['svim']
-	return ['pbsv']
+	return [get_snp_tool(), get_sv_tool()]
 
 
 def get_mapping() :
@@ -69,7 +100,8 @@ def get_bai(wildcards):
 	"""Shortcut to use bam directly."""
 	if 'bam_path' in samples.columns:
 		return samples.loc[wildcards.sample, "bam_path"]+'.bai'
-	return "mapping/%s-%s-pbmm2.bam.bai" % (wildcards.sample, wildcards.tech)
+	# return "mapping/%s-%s-pbmm2.bam.bai" % (wildcards.sample, wildcards.tech)
+	return "mapping/%s-%s-%s.bam.bai" % (wildcards.sample, wildcards.tech, wildcards.mapping)
 
 
 def get_suffix(string):

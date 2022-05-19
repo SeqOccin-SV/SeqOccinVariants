@@ -72,6 +72,8 @@ rule minimap:
 		"logs/minimap/{sample}-{tech}.log"
 	conda:
 		'../envs/svim_env.yaml'
+	params:
+		ulim = config['ulimit']
 	shell:
 		"ulimit -n {params.ulim}; "
 		"""

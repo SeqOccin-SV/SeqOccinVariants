@@ -6,17 +6,18 @@
 
 # SNP calling for CLR data 
 rule longshot:
+	wildcard_constraints:
+		tools = 'longshot'
+	# 	mapping = 'pbmm2'
 	input:
 		bam = get_bam,
 		bai = get_bai,
 		ref = config['ref'],
-		stats = "mapping/{sample}-{tech}-pbmm2.bam.stats"
-	wildcard_constraints:
-		mapping = "pbmm2"
+		stats = "mapping/{sample}-{tech}-{mapping}.bam.stats"
 	output:
-		"calling/{sample}-{tech}-{mapping}-longshot.vcf"
+		"calling/{sample}-{tech}-{mapping}-{tools}.vcf"
 	log:
-		"logs/longshot/{sample}-{tech}-{mapping}.log"
+		"logs/longshot/{sample}-{tech}-{mapping}-{tools}.log"
 	conda:
 		'../envs/longshot_env.yaml'
 	threads: get_threads('pbsv_discover',10)
