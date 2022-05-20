@@ -223,7 +223,8 @@ rule build_full_html:
     conda:
         '../envs/html_env.yaml'
     params:
-        path = workflow.basedir
+        path = workflow.basedir,
+        dtype = config['datatype']
     shell:
         """
         python3 {params.path}/scripts/html_methods.py \
@@ -233,5 +234,7 @@ rule build_full_html:
         -s {input.snp} \
         -i {input.index} \
         -n {input.number} \
-        -t {output} 2> {log}
+        -t {output} \
+        -w {params.path}/envs \
+        -d {params.dtype} 2> {log}
         """
