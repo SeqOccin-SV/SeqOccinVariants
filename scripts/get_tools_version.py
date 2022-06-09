@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 def get_dependencies(file) :
+    """Return a list of the tools and versions from an env.yaml file."""
     tools = []
     dep = False
     with open(file, 'r') as f :
@@ -47,6 +48,7 @@ def get_ont_tools(env_path) :
 
 
 def get_tools(env_path, data_type) :
+    """Return list of tools and version used depending on the data."""
     if data_type == 'CLR' :
         return get_CLR_tools(env_path)
     if data_type == 'CCS' or data_type == 'hifi' :

@@ -102,12 +102,12 @@ def get_title(filename, ext = "") :
     mCLR = re.match(CLR, filename)
     mONT = re.match(ONT, filename)
     if mCCS is not None :
-        return mCCS.group(1) + " " + ext
+        return mCCS.group(1) + ext
     if mCLR is not None :
-        return mCLR.group(1) + " " + ext
+        return mCLR.group(1) + ext
     if mONT is not None :
-        return mONT.group(1) + " " + ext
-    return (filename.split('.')[0] + " " + ext)
+        return mONT.group(1) + ext
+    return (filename.split('.')[0] + ext)
 
 
 def add_in_dic(dic, file) :
@@ -132,11 +132,11 @@ def build_png(files, png) :
     fig, (tab) = plt.subplots(len(dic['ax']),1, constrained_layout=True, 
           figsize=(12,3*len(dic['ax'])))
     if len(dic['ax']) == 1 :
-        title = get_title(dic[dic['ax'][0]][0], "depth distribution")
+        title = get_title(dic[dic['ax'][0]][0], " depth distribution")
         draw_depth_distribution(tab, dic[dic['ax'][0]][1], title)
     else :
         for i in range(len(dic['ax'])) :
-            title = get_title(dic[dic['ax'][i]][0], "depth distribution")
+            title = get_title(dic[dic['ax'][i]][0], " depth distribution")
             draw_depth_distribution(tab[i], dic[dic['ax'][i]][1], title)
     plt.savefig(png)
 
@@ -395,10 +395,10 @@ def draw_variantsizes_png(files, png) :
         axs.append("ax" + str(i))
     fig, axs = plt.subplots(len(files),1, constrained_layout=True, figsize=(12,3*len(files)))
     if len(files) == 1 :
-        draw_variantsizes(files[0], axs, title = get_title(files[0], "INS & DEL size distribution"))
+        draw_variantsizes(files[0], axs, title = get_title(files[0], " INS & DEL size distribution"))
     else :
         for i in range(len(files)) :
-            draw_variantsizes(files[i], axs[i], title = get_title(files[i], "INS & DEL size distribution"))
+            draw_variantsizes(files[i], axs[i], title = get_title(files[i], " INS & DEL size distribution"))
     plt.savefig(png)
 
 
@@ -499,10 +499,11 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     pbsv = get_files_from_file(pbsv_stats_files)
     dic = parse_vcf_for_table(pbsv)
     body += html_build_table(dic, 'pbsv structural variant stats')
-    png = png_naming(pbsv_stats_files)
-    pbsv_graphs(dic, png)
-    txt = png_to_base64txt(png)
-    body += html_graph_output(txt, 'pbsv stats barplots')
+    if len(dic['name']) > 1 :
+        png = png_naming(pbsv_stats_files)
+        pbsv_graphs(dic, png)
+        txt = png_to_base64txt(png)
+        body += html_graph_output(txt, 'pbsv stats barplots')
     # pbsv insertion & deletion size distribution
     variantsizes = get_files_from_file(variantsizes_files)
     png = png_naming(variantsizes_files)
@@ -512,10 +513,16 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     # SNP with longshot or deepvariant
     snp = get_files_from_file(snp_stats_files)
     dic_ls = parse_longshot_for_table(snp)
-    if snp_stats_files == "stats/SNP_longshot.stats" :
-        body += html_build_table(dic_ls, 'longshot SNP stats')
-    if snp_stats_files == "stats/SNP_dv.stats" :
-        body += html_build_table(dic_ls, 'deepvariant SNP stats')
+    longshot_compile = re.compile(r'.*([-_]longshot\.).*')
+    dv_compile = re.compile(r'.*([-_]dv\.).*')
+    longshot_match = re.match(longshot_compile, snp_stats_files)
+    dv_match = re.match(dv_compile, snp_stats_files)
+    title = 'SNP stats'
+    if longshot_match is not None :
+        title = 'longshot SNP stats'
+    elif dv_match is not None :
+        title = 'deepvariant SNP stats'
+    body += html_build_table(dic_ls, title)
     # Tools and versions
     body += tools_to_html(workdir, datatype)
 

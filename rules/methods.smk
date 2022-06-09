@@ -42,7 +42,7 @@ def get_snp_tool() :
 	if config['datatype'] == 'CLR' :
 		return 'longshot'
 	elif config['datatype'] in ['CCS', 'hifi'] :
-		return 'sv'
+		return 'dv'
 	elif config['datatype'] in ['ONT', 'nanopore'] :
 		# This is not grouped with CLR because it should be later changed to pepper
 		return 'longshot'
