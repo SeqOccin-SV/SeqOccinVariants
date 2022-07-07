@@ -21,7 +21,7 @@ workdir: config["workdir"]
 rule all:
 	input:
 		in1 = expand("calling/{sample}-{tech}-{mapping}-{tools}.vcf.gz.tbi", sample=samples.index, tech=config['datatype'], mapping = get_mapping(), tools=get_tools()),
-		# html = "stats/pipeline_output.html"
+		html = "stats/pipeline_output.html",
 		htmls = expand("stats/{sample}-{tech}-{mapping}-{svtools}-{snptools}-stats.html", sample=samples.index, tech=config['datatype'], mapping = get_mapping(), svtools=get_sv_tool(), snptools=get_snp_tool())
 
 
@@ -29,7 +29,8 @@ include : "rules/mapping.smk"
 include : "rules/sv_calling.smk"
 include : "rules/snp_calling.smk"
 include : "rules/vcf_handling.smk"
-# include : "rules/html_builder.smk"
+include : "rules/html_prep.smk"
+include : "rules/html_builder.smk"
 include : "rules/single_html.smk"
 
 

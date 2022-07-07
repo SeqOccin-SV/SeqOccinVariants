@@ -281,6 +281,23 @@ def png_to_base64txt(png, txt = None) :
     return file_to_single_string(txt)
 
 
+def deal_with_rounding_bias(r, g, b) :
+    """Python rounding for floats can make a strict [0,1] interval of values fail."""
+    if r < 0 :
+        r = 0
+    elif r > 1 :
+        r = 1
+    if g < 0 :
+        g = 0
+    elif g > 1 :
+        g = 1
+    if b < 0 :
+        b = 0
+    elif b > 1 :
+        b = 1
+    return((r, g, b))
+
+
 def color_scaling(column_length) :
     """Creat a color scaling based on the number of individuals for plotting."""
     colors = []
@@ -296,7 +313,7 @@ def color_scaling(column_length) :
     b = 1
     incr = 1/column_length
     for i in range(0,nbG) :
-        colors.append((r,g,b))
+        colors.append(deal_with_rounding_bias(r,g,b))
         r += incr
         b -= incr
         g += incr*2
@@ -304,7 +321,8 @@ def color_scaling(column_length) :
         r += incr
         b -= incr
         g -= incr*2
-        colors.append((r,g,b))
+        colors.append(deal_with_rounding_bias(r,g,b))
+    # Make sure python rounding dosn't generate values >1 our <0.
     return colors
 
 
