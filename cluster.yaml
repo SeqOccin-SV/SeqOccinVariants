@@ -33,6 +33,10 @@ deepvariant:
   partition: 'unlimitq'
   time: '6-00:00:00'
 
+genomeindex:
+  mem: 16
+  threads: 8
+
 minimap:
   mem: 72
   threads: 12

@@ -19,7 +19,7 @@ rule compress_tabix:
 		'../envs/tabix_env.yaml'
 	threads: 1
 	shell:
-		"bgzip {input.vcf}; "
+		"bcftools sort -Oz {input.vcf} -o {output.zip}; "
 		"tabix {output.zip}"
 
 
