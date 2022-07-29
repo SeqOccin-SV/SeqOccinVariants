@@ -340,7 +340,7 @@ def hist_draw(df, ax, col) :
     if max_cap > 0 :
         ax.set_ylim([0, max_cap])
     ax.set_title(col, fontsize=18)
-    ax.xaxis.set_major_locator(Ticker.FixedLocator([x+0.5 for x in list(range(0, len(df['name'])))]))
+    ax.xaxis.set_major_locator(Ticker.FixedLocator([x+0.1 for x in list(range(0, len(df['name'])))]))
     ax.set_xticklabels(df['name'], rotation=45, ha='right')
 
 
@@ -422,7 +422,7 @@ def draw_variantsizes_png(files, png) :
 
 def png_naming(file_name) :
     """Define png file name based on input file name."""
-    return "stats/" + file_name.split('/')[-1] + ".png"
+    return "../stats/" + file_name.split('/')[-1] + ".png"
 
 
 def mapped_reads(seq_cout, indx) :
@@ -486,6 +486,36 @@ def tools_to_html(env_path, data_type) :
     return body
 
 
+def snp_stats_title(snp_stats_files):
+    longshot_compile = re.compile(r'.*([-_]longshot\.).*')
+    dv_compile = re.compile(r'.*([-_]dv\.).*')
+    longshot_match = re.match(longshot_compile, snp_stats_files)
+    dv_match = re.match(dv_compile, snp_stats_files)
+    title = 'SNP stats'
+    if longshot_match is not None :
+        title = 'longshot SNP stats'
+    elif dv_match is not None :
+        title = 'deepvariant SNP stats'
+    return title
+
+
+def data_tool(tech) :
+    tools = {'mapping' : '', 'sv' : '', 'snp' : ''}
+    if tech == 'ONT' or tech == 'nanoport' :
+        tools['mapping'] = 'minimap2'
+        tools['sv'] = 'svim'
+        tools['snp'] = 'longshot'
+    elif tech == 'CCS' or tech == 'hifi' :
+        tools['mapping'] = 'pbmm2'
+        tools['sv'] = 'pbsv'
+        tools['snp'] = 'dv'
+    elif tech == 'CLR' :
+        tools['mapping'] = 'pbmm2'
+        tools['sv'] = 'pbsv'
+        tools['snp'] = 'longshot'
+    return tools
+
+
 def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_stats_files, number, index, workdir, html = "stats/pipeline_output.html", datatype = "CLR") :
     """Write an html report file based on stats files.
 
@@ -504,24 +534,25 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     """
     sns.set_theme()
     body = "<h1>PacBio Variants pipeline stats</h1>\n<br><br>"
+    tools = data_tool(datatype)
     # mapping data
     mapped = mapped_coverage_html(mapped_reads(number, index))
     body += html_build_table(mapped, 'Mapped reads')
     # Build pbmm2 depth graphs
-    bam = get_files_from_file(bam_stats_files) 
+    bam = get_files_from_file(bam_stats_files)
     png = png_naming(bam_stats_files)
     build_png(bam, png)
     txt = png_to_base64txt(png)
-    body += html_graph_output(txt, 'Samples pbmm2')
+    body += html_graph_output(txt, 'Samples ' + tools['mapping'])
     # get pbsv vcf file data for variant table
     pbsv = get_files_from_file(pbsv_stats_files)
     dic = parse_vcf_for_table(pbsv)
-    body += html_build_table(dic, 'pbsv structural variant stats')
+    body += html_build_table(dic, tools['sv'] + ' structural variant stats')
     if len(dic['name']) > 1 :
         png = png_naming(pbsv_stats_files)
         pbsv_graphs(dic, png)
         txt = png_to_base64txt(png)
-        body += html_graph_output(txt, 'pbsv stats barplots')
+        body += html_graph_output(txt, tools['sv'] + ' stats barplots')
     # pbsv insertion & deletion size distribution
     variantsizes = get_files_from_file(variantsizes_files)
     png = png_naming(variantsizes_files)
@@ -531,15 +562,7 @@ def write_full_html(bam_stats_files, pbsv_stats_files, variantsizes_files, snp_s
     # SNP with longshot or deepvariant
     snp = get_files_from_file(snp_stats_files)
     dic_ls = parse_longshot_for_table(snp)
-    longshot_compile = re.compile(r'.*([-_]longshot\.).*')
-    dv_compile = re.compile(r'.*([-_]dv\.).*')
-    longshot_match = re.match(longshot_compile, snp_stats_files)
-    dv_match = re.match(dv_compile, snp_stats_files)
-    title = 'SNP stats'
-    if longshot_match is not None :
-        title = 'longshot SNP stats'
-    elif dv_match is not None :
-        title = 'deepvariant SNP stats'
+    title = snp_stats_title(snp_stats_files)
     body += html_build_table(dic_ls, title)
     # Tools and versions
     body += tools_to_html(workdir, datatype)

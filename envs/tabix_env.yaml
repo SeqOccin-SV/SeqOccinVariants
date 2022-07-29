@@ -1,6 +1,7 @@
 name: tabix
 channels:
   - bioconda
+  - conda-forge
 dependencies:
-  - htslib=1.11
+  - htslib=1.14
   - bcftools=1.14
