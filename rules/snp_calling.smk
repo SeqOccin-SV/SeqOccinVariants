@@ -37,8 +37,8 @@ rule deepvariant:
 		bai = get_bai,
 		ref = config['ref'],
 		stats = "mapping/{sample}-{tech}-pbmm2.bam.stats"
-	wildcard_constraints:
-		mapping = "pbmm2"
+	# wildcard_constraints:
+	# 	mapping = "pbmm2"
 	output:
 		vcf = "calling/{sample}-{tech}-{mapping}-dv.vcf.gz",
 		gvcf = "calling/{sample}-{tech}-{mapping}-dv.gvcf.gz"

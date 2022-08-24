@@ -41,11 +41,11 @@ def get_snp_tool() :
 	"""Get the tool used for snp calling depending on data type."""
 	if config['datatype'] == 'CLR' :
 		return 'longshot'
-	elif config['datatype'] in ['CCS', 'hifi'] :
+	elif config['datatype'] in ['CCS', 'hifi', 'ONT', 'nanopore'] :
 		return 'dv'
-	elif config['datatype'] in ['ONT', 'nanopore'] :
+	# elif config['datatype'] in ['ONT', 'nanopore'] :
 		# This is not grouped with CLR because it should be later changed to pepper
-		return 'longshot'
+		# return 'longshot'
 	return None
 
 
