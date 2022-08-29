@@ -59,7 +59,8 @@ rule deepvariant:
 		--output_vcf={output.vcf} \
 		--output_gvcf={output.gvcf} \
 		--sample_name={wildcards.sample} \
-		--num_shards={threads}
+		--num_shards={threads} \
+        --intermediate_results_dir tmp/
 		"""
 
 
