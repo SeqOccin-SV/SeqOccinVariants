@@ -422,7 +422,7 @@ def draw_variantsizes_png(files, png) :
 
 def png_naming(file_name) :
     """Define png file name based on input file name."""
-    return "../stats/" + file_name.split('/')[-1] + ".png"
+    return "stats/" + file_name.split('/')[-1] + ".png"
 
 
 def mapped_reads(seq_cout, indx) :
