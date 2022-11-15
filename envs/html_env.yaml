@@ -1,0 +1,11 @@
+name: html
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - pandas
+  - numpy
+  - matplotlib
+  - pretty_html_table
+  - seaborn
+  - bcftools=1.14

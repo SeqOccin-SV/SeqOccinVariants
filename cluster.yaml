@@ -10,17 +10,21 @@ __default__:
 pbmm2:
   mem: 80
   threads: 20
+  
+bam_sort:
+  mem: 96
+  threads: 12
 
 pbsv_discover:
   mem: 80
   threads: 10
 
 pbsv_call:
-  mem: 120
+  mem: 150
   threads: 12
 
 longshot:
-  mem: 120
+  mem: 192
   threads: 12
 
 deepvariant:
@@ -28,3 +32,21 @@ deepvariant:
   threads: 20
   partition: 'unlimitq'
   time: '6-00:00:00'
+
+genomeindex:
+  mem: 16
+  threads: 8
+
+minimap:
+  mem: 72
+  threads: 12
+  
+svim:
+  mem: 72
+  threads: 12
+  time: '4-00:00:00'
+  
+get_sequence_numbers:
+  mem: 32
+  threads: 10
+

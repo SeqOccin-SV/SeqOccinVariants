@@ -5,15 +5,90 @@
 # Update cluster-config to profile
 
 
+Usage() {
+	echo "Usage : ./launch.pbvariants.smkj [Options]"
+	echo ""
+	echo "Run the snakemake pipeline for structural variant detection."
+}
 
-if [ $# -ne 0 ]
+
+Help() {
+	Usage
+	echo ""
+	echo "Options :"
+	echo "	-n	Run snakemake dry-run."
+	echo "	-l	Local run (default run is set to run on cluster)."
+	echo "	-c	Uses the --conda-create-envs-only snakemake parameter."
+	echo "	-t	Number of threads used by snakemake, default is 10."
+	echo "	-f	Force the execution of first or selected rule and all rules depending on it. --forceall snakemake option."
+	echo "	-u	Unlock snakemake if it locks after a kill."
+	echo "	-r	snakemake --rerun-incomplete : Re-run all jobs the output of which is recognized as incomplete."
+	echo "	-d	Snakemake dag building run."
+	echo "	-h	Help, displays this message."
+}
+
+
+# Default values
+DRY_RUN=''
+LOCAL='false'
+THREADS=10
+CONDA=''
+FORCE=''
+UNLOCK=''
+RERUN=''
+DAG=''
+
+while getopts nlt:cfurdh flag
+do
+	case "${flag}" in
+		n) DRY_RUN="-n";;
+		l) LOCAL='true';;
+		t) THREADS=${OPTARG};;
+		c) CONDA='--conda-create-envs-only';;
+		f) FORCE='--forceall';;
+		u) UNLOCK='--unlock';;
+		r) RERUN='--rerun-incomplete';;
+		d) DAG='--dag';;
+		h) Help
+		exit;;
+		\?) Help
+		exit;;
+		*) Help
+		exit;;
+	esac
+done
+
+
+if [ $LOCAL = 'false' ]
 then
-	echo 'USAGE: launch.pbvariants.smkj'
-	exit 1
+	module load bioinfo/snakemake-5.25.0
+	module load system/Miniconda3
+	snakemake -j $THREADS --cluster-config cluster.yaml \
+	--cluster "sbatch -c {cluster.threads} -p {cluster.partition} --mem={cluster.mem}G -J {cluster.name}" \
+	--configfile config.yaml \
+	--use-conda --use-envmodules -p $DRY_RUN $CONDA $FORCE $UNLOCK $RERUN $DAG
+else
+	snakemake -j $THREADS --configfile config.yaml --use-conda --use-envmodules -p $DRY_RUN $CONDA $FORCE $RERUN $DAG
 fi
 
 
-snakemake -j 10 --cluster-config cluster.yaml \
-	--cluster "sbatch -c {cluster.threads} -p {cluster.partition} --mem={cluster.mem}G -J {cluster.name}" \
-	--configfile config.yaml \
-	--use-conda --use-envmodules -p
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

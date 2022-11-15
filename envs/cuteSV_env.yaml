@@ -1,7 +1,6 @@
-name: tabix
+name: cuteSV
 channels:
   - bioconda
   - conda-forge
 dependencies:
-  - htslib=1.14
-  - bcftools=1.14
+  - cutesv
