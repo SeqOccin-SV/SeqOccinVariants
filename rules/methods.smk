@@ -5,6 +5,7 @@
 import pandas as pd
 from pprint import pprint
 from pathlib import Path
+import re
 # import pathlib
 
 ###############################################################
@@ -171,7 +172,63 @@ def abs_path(file_name):
 	return str(Path(file_name).resolve())
 
 
+def get_fai() :
+	"""Return the path to the fai file associated with fasta ref."""
+	return config['ref'] + '.fai'
 
+
+def get_bed_name() :
+	"""Use the referance file to name the associated bed file."""
+	file = config['ref'].split('/')[-1]
+	return '.'.join(file.split('.')[:-1]) + '.bed'
+
+
+def get_fasta_name() :
+	"""Get the name of the fasta file without the extention."""
+	return '.'.join(config['ref'].split('/')[-1].split('.')[:-1])
+
+
+def get_chromosomes() :
+	is_chr = re.compile(r'(chr)?[0-9,X]+$')
+	chrs = ['unmapped']
+	with open(get_fai(), 'r') as fai :
+		for line in fai :
+			name = line.split()[0]
+			if re.match(is_chr, name) :
+				chrs.append(name)
+	return chrs
+
+
+def bed_split_name(bed, chr) :
+	basename = '.'.join(bed.split('.')[:-1])
+	return basename + "-" + chr + ".bed"
+
+
+
+def split_bed() :
+	bed = get_bed_name()
+	chrs = get_chromosomes()
+	with open(bed, 'r') as file :
+		with open(bed_split_name(bed, "unmapped"), 'a') as unmapped :
+			for line in file :
+				chr = line.split()[0]
+				if chr in chrs :
+					with open(bed_split_name(bed, chr), 'w') as chr_bed :
+						chr_bed.write(line)
+				else :
+					unmapped.write(line)
+
+
+
+def get_cutesv_param() :
+	"""Get param for cuteSV depending on sequencing tech following recomandations."""
+	if config['datatype'] == 'CLR' :
+		return '--max_cluster_bias_INS 100 --diff_ratio_merging_INS 0.3 --max_cluster_bias_DEL 200 --diff_ratio_merging_DEL 0.5'
+	elif config['datatype'] == 'CCS' :
+		return '--max_cluster_bias_INS 1000 --diff_ratio_merging_INS 0.9 --max_cluster_bias_DEL 1000 --diff_ratio_merging_DEL 0.5'
+	elif config['datatype'] == 'ONT' :
+		return '--max_cluster_bias_INS 100 --diff_ratio_merging_INS 0.3 --max_cluster_bias_DEL 100 --diff_ratio_merging_DEL 0.3'
+	return 'unknown'
 
 
 

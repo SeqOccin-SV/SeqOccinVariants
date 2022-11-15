@@ -194,13 +194,24 @@ def html_graph_output(png, title, text = "", subtext = "") :
     return header + info + img + under_img
 
 
+def replace_first_line(text, newline) :
+    """Replace the first line of a text by another."""
+    line_pos = 0
+    for c in text :
+        if c == "\n" :
+            break
+        line_pos += 1
+    return newline + text[line_pos:]
+
+
 def html_build_table(dic, title = "Structural variant stats", text = "", subtext = "") :
     """Build an HTML table from a dictionary."""
     body = "<h2>" + title + "</h2>\n"
     body += "<p>" + text + "</p>\n"
     df = pd.DataFrame(dic)
-    table = build_table(df, 'blue_light', font_size = "25px")
-    new_table = table[0:28] + 'center' + table[37:]
+    table = build_table(df, 'blue_light', font_size = "25px", text_align='center')
+    # new_table = table[0:28] + 'center' + table[37:]
+    new_table = replace_first_line(table, '<p><table class="center">')
     body += new_table
     body += "<p>" + subtext + "</p>\n"
     body += "<br><br>"

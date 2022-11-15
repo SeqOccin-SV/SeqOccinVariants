@@ -76,7 +76,24 @@ rule svim:
 		"echo {input}"
 
 
-
+# TODO : 
+# - Create cuteSV conda environment
+# - Change param depending on tech
+rule cuteSV:
+	input:
+		bam = get_bam
+		ref = config['ref']
+	output:
+		"calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
+	conda:
+		'../envs/cuteSV_env.yaml'
+	params:
+		cuteSV_param = get_cutesv_param
+	shell:
+		"""
+		cuteSV -t 12 --min_support 1 {params.cuteSV_param} \
+		{input.bam} {input.fasta} {output} calling
+		"""
 
 
 
