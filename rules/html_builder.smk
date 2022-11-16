@@ -34,6 +34,16 @@ rule svim_stats_for_html:
         "echo {input} | tr \" \" \"\\n\" > {output}"
 
 
+# Groupe cuteSV stats output
+rule cuteSV_stats_for_html:
+    input:
+        expand("stats/{sample}-{tech}-{mapping}-cuteSV.vcf.stats.txt", sample=samples.index, tech=config['datatype'], mapping = get_mapping())
+    output:
+        "stats/cuteSV_stats_for_html.stats"
+    shell:
+        "echo {input} | tr \" \" \"\\n\" > {output}"
+
+
 # Groupe all variant sizes information
 rule variantsizes_for_html:
     input:

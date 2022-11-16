@@ -34,6 +34,17 @@ rule single_svim_stats_for_html:
         "echo {input} > {output}"
 
 
+# Groupe cuteSV stats output
+rule single_cuteSV_stats_for_html:
+    input:
+        "stats/{sample}-{tech}-{mapping}-cuteSV.vcf.stats.txt"
+    output:
+        # "stats/svim_stats_for_html.stats"
+        "stats/{sample}-{tech}-{mapping}-cuteSV.vcf.html.stats.txt"
+    shell:
+        "echo {input} > {output}"
+
+
 # Groupe all variant sizes information
 rule single_variantsizes_for_html:
     input:

@@ -29,6 +29,20 @@ rule svim_build_stats:
         """
 
 
+# Build stats files from cuteSV output files
+rule cuteSV_build_stats:
+    input:
+        "calling/{sample}-{tech}-{mapping}-cuteSV.vcf.gz"
+    output:
+        "stats/{sample}-{tech}-{mapping}-cuteSV.vcf.stats.txt"
+    conda:
+        '../envs/html_env.yaml'
+    shell:
+        """
+        bcftools query -f "%ID\n" {input} | cut -f2 -d'.' | sort | uniq -c > {output}
+        """
+
+
 # Calculate variant sizes for each individual
 rule set_variantsizes:
     input:

@@ -24,6 +24,16 @@ rule split_bed:
 		split_bed()
 
 
+rule trim_unplaced_bed:
+	input:
+		bed = "{ref}-unmapped.bed"
+	output:
+		"{ref}-trimed-unmapped.bed"
+	run:
+		"""
+		
+		"""
+
 
 # SNP calling for CLR data 
 rule longshot:
