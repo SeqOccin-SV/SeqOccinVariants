@@ -28,7 +28,7 @@ longshot:
   threads: 12
 
 deepvariant:
-  mem: 120
+  mem: 192
   threads: 20
   partition: 'unlimitq'
   time: '6-00:00:00'
@@ -45,6 +45,10 @@ svim:
   mem: 72
   threads: 12
   time: '4-00:00:00'
+
+cuteSV:
+  mem: 64
+  threads: 12
   
 get_sequence_numbers:
   mem: 32

@@ -1,5 +1,5 @@
 # Path to reference genome fasta file
-ref: '/home/quentinboone/Bureau/data/other/goat_genome.fa'
+ref: '/work/project/seqoccin/data/species/sus_scrofa/Sscrofa11.1/GCA_000003025.6_Sscrofa11.1_genomic.ensemblchrnames.fa'
 # ref: '/work/project/seqoccin/svdetection/test_pipeline/q_test/data/goat_genome.fa'
 
 # Sample tsv file. Is composed of two columns, sample and either path or bam_path.
@@ -9,7 +9,7 @@ samples: 'samples.tsv'
 
 # Datatype in the sample file. Either 'CLR', 'CCS' or 'ONT'
 # Any other value will disable SNP calling
-datatype: 'CLR' 
+datatype: 'ONT'
 
 # Max length for insertion and duplication calling
 # pbsv call default is 10k
@@ -18,12 +18,19 @@ max-length: 20000
 # Path to the directory that will contain the output files.
 # The path is relative to where your snakemake file is by default.
 # if the directory doesn't exist it will be created.
-workdir: '/home/quentinboone/Bureau/v11/goat_test'
+workdir: '/work/project/seqoccin/svdetection/test_pipeline/q_test/Variants/sus_scrofa_ONT'
 
 # ulimit default is 1024 but can cause samtools sort to crash despite
 # large memory allocations. If samtools sort crashes try giving more memory
 # in cluster.yaml. If this still fails you can increase the ulimit here.
 ulimit: 4096
+
+# cuteSV can face problems with a large number of unplaced reads so  we introduce
+# a cutoff value to remove all those that are smaller than it. The default value
+# is set at 1mbp. This cutoff will also be applied to deepvariant.
+# Note : This value should not be smaller than your chromosomes or they will
+# not be taken into account as they are also affected by the trimming process.
+cutoff: 1000000
 
 # Annotation, if present use the faste file to annotate SV
 # A new INFO filed called SVANN will contain the fasta ID if there is a match
