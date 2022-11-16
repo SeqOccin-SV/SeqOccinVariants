@@ -76,23 +76,44 @@ rule svim:
 		"echo {input}"
 
 
-# TODO : 
-# - Create cuteSV conda environment
-# - Change param depending on tech
+rule trim_bam:
+	input:
+		bam = get_bam,
+		bed = expand("{ref}-trimed.bed", ref=get_fasta_name())
+	output:
+		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
+		bai = "mapping/{sample}-{tech}-{mapping}_trimed.bam.bai"
+	conda:
+		"../envs/samtools_env.yaml"
+	threads:
+		get_threads('bam_index',4)
+	log:
+		view = "logs/cuteSV/{sample}-{tech}-{mapping}-samtools-view.log",
+		index = "logs/cuteSV/{sample}-{tech}-{mapping}-samtools-index.log"
+	shell:
+		"""
+		samtools view -b -h -L {input.bed} {input.bam} > {output.bam} 2> {log.view};
+		samtools index -@ {threads} {output.bam} 2> {log.index}
+		"""
+
+
+
 rule cuteSV:
 	input:
-		bam = get_bam
+		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
 		ref = config['ref']
 	output:
 		"calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
 	conda:
 		'../envs/cuteSV_env.yaml'
 	params:
-		cuteSV_param = get_cutesv_param
+		cuteSV_param = get_cutesv_param()
+	log:
+		"logs/cuteSV/{sample}-{tech}-{mapping}-cuteSV.log"
 	shell:
 		"""
 		cuteSV -t 12 --min_support 1 {params.cuteSV_param} \
-		{input.bam} {input.fasta} {output} calling
+		{input.bam} {input.ref} {output} calling 2> {log}
 		"""
 
 
