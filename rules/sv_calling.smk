@@ -79,7 +79,7 @@ rule svim:
 rule trim_bam:
 	input:
 		bam = get_bam,
-		bed = expand("{ref}-trimed.bed", ref=get_fasta_name())
+		bed = expand("{ref}.bed", ref=get_fasta_name())
 	output:
 		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
 		bai = "mapping/{sample}-{tech}-{mapping}_trimed.bam.bai"
@@ -103,17 +103,18 @@ rule cuteSV:
 		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
 		ref = config['ref']
 	output:
-		"calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
+		vcf = "calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
 	conda:
 		'../envs/cuteSV_env.yaml'
 	params:
-		cuteSV_param = get_cutesv_param()
+		cuteSV_param = get_cutesv_param(),
+		tempdir = "calling/{sample}-{tech}-{mapping}-cuteSV"
 	log:
 		"logs/cuteSV/{sample}-{tech}-{mapping}-cuteSV.log"
 	shell:
 		"""
 		cuteSV -t 12 --min_support 1 {params.cuteSV_param} \
-		{input.bam} {input.ref} {output} calling 2> {log}
+		{input.bam} {input.ref} {output.vcf} {params.tempdir} 2> {log}
 		"""
 
 

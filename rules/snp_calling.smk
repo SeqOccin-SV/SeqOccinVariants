@@ -4,35 +4,24 @@
 ### SNP Calling
 
 
-rule build_bed:
-	input:
-		fai = get_fai()
-	output:
-		bed = "{ref}.bed"
-	shell:
-		"""
-		awk 'BEGIN {{FS = "\t"}}; {{print $1 FS \"0\" FS $2}}' {input.fai} > {output.bed}
-		"""
+# rule build_bed:
+# 	input:
+# 		fai = get_fai()
+# 	output:
+# 		bed = "{ref}.bed"
+# 	shell:
+# 		"""
+# 		awk 'BEGIN {{FS = "\t"}}; {{print $1 FS \"0\" FS $2}}' {input.fai} > {output.bed}
+# 		"""
 
 
-rule split_bed:
-	input:
-		bed = expand("{ref}.bed", ref=get_fasta_name())
-	output:
-		chr_file = expand("{ref}-{chr}.bed", ref=get_fasta_name(), chr=get_chromosomes())
-	run:
-		split_bed()
-
-
-rule trim_unplaced_bed:
-	input:
-		bed = "{ref}-unmapped.bed"
-	output:
-		"{ref}-trimed-unmapped.bed"
-	run:
-		"""
-		
-		"""
+# rule split_bed:
+# 	input:
+# 		bed = expand("{ref}.bed", ref=get_fasta_name())
+# 	output:
+# 		chr_file = expand("{ref}-{chr}.bed", ref=get_fasta_name(), chr=get_chromosomes())
+# 	run:
+# 		split_bed()
 
 
 # SNP calling for CLR data 
