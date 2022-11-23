@@ -113,6 +113,7 @@ rule cuteSV:
 		"logs/cuteSV/{sample}-{tech}-{mapping}-cuteSV.log"
 	shell:
 		"""
+		mkdir {params.tempdir}
 		cuteSV -t 12 --min_support 1 {params.cuteSV_param} \
 		{input.bam} {input.ref} {output.vcf} {params.tempdir} 2> {log}
 		"""
