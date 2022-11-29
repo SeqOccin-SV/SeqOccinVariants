@@ -17,7 +17,6 @@ rule single_pbsv_stats_for_html:
     input:
         "stats/{sample}-{tech}-pbmm2-pbsv.vcf.stats.txt"
     output:
-        # "stats/pbsv_stats_for_html.stats"
         "stats/{sample}-{tech}-pbmm2-pbsv.vcf.html.stats.txt"
     shell:
         "echo {input} > {output}"
@@ -28,7 +27,6 @@ rule single_svim_stats_for_html:
     input:
         "stats/{sample}-{tech}-minimap-svim.vcf.stats.txt"
     output:
-        # "stats/svim_stats_for_html.stats"
         "stats/{sample}-{tech}-minimap-svim.vcf.html.stats.txt"
     shell:
         "echo {input} > {output}"
@@ -39,7 +37,6 @@ rule single_cuteSV_stats_for_html:
     input:
         "stats/{sample}-{tech}-{mapping}-cuteSV.vcf.stats.txt"
     output:
-        # "stats/svim_stats_for_html.stats"
         "stats/{sample}-{tech}-{mapping}-cuteSV.vcf.html.stats.txt"
     shell:
         "echo {input} > {output}"
@@ -50,7 +47,6 @@ rule single_variantsizes_for_html:
     input:
         "stats/{sample}-{tech}-{mapping}-{svtools}.variantsizes.tsv"
     output:
-        # "stats/{tools}_txt_variantsizes.tsv"
         "stats/{sample}-{tech}-{mapping}-{svtools}.html.variantsizes.tsv"
     shell:
         "echo {input} > {output}"
@@ -72,7 +68,6 @@ else :
         input:
             "stats/{sample}-{tech}-{mapping}-dv.vcf.gz.stats"
         output:
-            # "stats/SNP_dv.stats"
             "stats/{sample}-{tech}-{mapping}-dv.vcf.gz.html.stats"
         shell:
             "echo {input} > {output}"
@@ -82,7 +77,6 @@ rule single_group_sequence_numbers:
     input:
         "stats/{sample}-{tech}_sequences_count.stats"
     output:
-        # "stats/sequences_count.stats"
         "stats/{sample}-{tech}_sequences_count.html.stats"
     shell:
         "cat {input} > {output}"

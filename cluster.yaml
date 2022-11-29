@@ -28,7 +28,7 @@ longshot:
   threads: 12
 
 deepvariant:
-  mem: 192
+  mem: 64
   threads: 20
   partition: 'unlimitq'
   time: '6-00:00:00'
