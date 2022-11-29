@@ -30,10 +30,7 @@ rule pbsv_call:
 		ref = config['ref']
 	output:
 		"calling/{sample}-{tech}-pbmm2-pbsv.vcf"
-	# resources:
-		# type = rules.pbmm2.params.type
 	params:
-		# is_ccs = lambda wildcards, resources: '--ccs' if resources.type==2 or resources.type==3 else '',
 		has_annotation = lambda wildcards, resources: '--annotations '+config['annotation'] if 'annotation' in config else '',
 		max_length = str(config['max-length'])
 	log:
@@ -57,13 +54,11 @@ rule pbsv_call:
 
 rule svim:
 	input:
-		#"mapping/{sample}-{tech}-minimap.bam"
 		get_bam
 	wildcard_constraints:
 		mapping = "minimap",
 		tools = 'svim'
 	output:
-		#"calling/{sample}-{tech}-minimap-{tools}.vcf"
 		"calling/{sample}-{tech}-{mapping}-{tools}.vcf"
 	params:
 		genome = config['ref'],
@@ -79,7 +74,7 @@ rule svim:
 rule trim_bam:
 	input:
 		bam = get_bam,
-		bed = expand("{ref}-trimed.bed", ref=get_fasta_name())
+		bed = expand("{ref}.bed", ref=get_fasta_name())
 	output:
 		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
 		bai = "mapping/{sample}-{tech}-{mapping}_trimed.bam.bai"
@@ -103,17 +98,19 @@ rule cuteSV:
 		bam = "mapping/{sample}-{tech}-{mapping}_trimed.bam",
 		ref = config['ref']
 	output:
-		"calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
+		vcf = "calling/{sample}-{tech}-{mapping}-cuteSV.vcf"
 	conda:
 		'../envs/cuteSV_env.yaml'
 	params:
-		cuteSV_param = get_cutesv_param()
+		cuteSV_param = get_cutesv_param(),
+		tempdir = "calling/{sample}-{tech}-{mapping}-cuteSV"
 	log:
 		"logs/cuteSV/{sample}-{tech}-{mapping}-cuteSV.log"
 	shell:
 		"""
+		mkdir {params.tempdir}
 		cuteSV -t 12 --min_support 1 {params.cuteSV_param} \
-		{input.bam} {input.ref} {output} calling 2> {log}
+		{input.bam} {input.ref} {output.vcf} {params.tempdir} 2> {log}
 		"""
 
 

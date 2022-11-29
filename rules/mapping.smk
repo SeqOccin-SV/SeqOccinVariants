@@ -58,33 +58,6 @@ rule genomeindex:
 		"minimap2 -x map-ont -d {output} {input}"
 
 
-# rule minimap:
-# 	input:
-# 		reads=get_files,
-# 		minimapindex="minimapindex/genome.mmi"
-# 	output:
-# 		bam="mapping/{sample}-{tech}-minimap.bam",
-# 		bai="mapping/{sample}-{tech}-minimap.bam.bai",
-# 		stats="mapping/{sample}-{tech}-minimap.bam.stats"
-# 	threads:
-# 		get_threads("minimap", 12)
-# 	log:
-# 		"logs/minimap/{sample}-{tech}.log"
-# 	conda:
-# 		'../envs/svim_env.yaml'
-# 	params:
-# 		ulim = config['ulimit']
-# 	shell:
-# 		"ulimit -n {params.ulim}; "
-# 		"""
-# 		minimap2 --MD -t {threads} -a {input.minimapindex} {input.reads} | \
-# 		samtools view -bS | \
-# 		samtools sort -@{threads} -o {output.bam} 2> {log};
-# 		"""
-# 		"samtools stats -@{threads} {output.bam} > {output.stats}; "
-# 		"samtools index {output.bam}"
-
-
 rule minimap:
 	input:
 		reads=get_files,
