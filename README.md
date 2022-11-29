@@ -33,6 +33,7 @@ First, modify the ```config.yaml```. There are several element that can be modif
 - **samples** path to the tsv file following one of the two possible content (see below)
 - **datatype** Either CLR, CCS or ONT.
 - **max-length** max-length for insertion and duplication detection. Large value increase RAM usage. Between 10000 and 50000 is a good base.
+- **workdir** directory where the the output files are to be generated.
 - **ulimit** maximum number of files that can be open simultaneously. This can be necessary to increase if samtools sort creates to many temporary files.
 - **cutoff** there are a number of sequences that can't be mapped in the chromosomes and are referred to as unplaced. A large amount of unplaced can lead to extensive runtime for deepvariant and cuteSV with little added value. This cutoff fixes the minimal accepted size for unplaced and chromosomes (make sure the value is not smaller than your smallest chromosomes).
 - **annotation** path to a fasta file for SV annotation. Annotated variants will have a SVANN field with the matching fasta header.
