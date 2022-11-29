@@ -2,7 +2,7 @@
 
 Snakemake pipeline for full variant detection on PacBio Data (CLR, CCS) and nanoport Data (ONT)
 
-To get time pipeline :
+Getting the pipeline :
 
 ```bash
 git clone https://github.com/SeqOccin-SV/SeqOccinVariants
