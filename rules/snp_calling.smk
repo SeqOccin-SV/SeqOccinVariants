@@ -30,6 +30,16 @@ rule longshot:
 		"""
 
 
+
+rule get_deepvariant_image:
+	output:
+		sif = "images/deepvariant.sif"
+	envmodules:
+		"system/singularity-3.5.3"
+	shell:
+		"""singularity build {output.sif} docker://google/deepvariant:1.3.0"""
+
+
 #SNP calling for HiFi data
 rule deepvariant:
 	input:
@@ -37,7 +47,8 @@ rule deepvariant:
 		bai = get_bai,
 		ref = config['ref'],
 		bed = get_fasta_name() + "-{chr}.bed",
-		stats = "mapping/{sample}-{tech}-{mapping}.bam.stats"
+		stats = "mapping/{sample}-{tech}-{mapping}.bam.stats",
+		image = "images/deepvariant.sif"
 	output:
 		vcf = "calling/{sample}-{tech}-{mapping}-{chr}-dv.vcf.gz",
 		gvcf = "calling/{sample}-{tech}-{mapping}-{chr}-dv.gvcf.gz"
@@ -49,7 +60,7 @@ rule deepvariant:
 	shell:
 		"""
 		singularity exec -B /usr/bin/locale:/usr/bin/locale,/work/project/seqoccin:/work/project/seqoccin \
-		-W ./ docker://google/deepvariant:1.3.0 \
+		-W ./ {input.image} \
 		/opt/deepvariant/bin/run_deepvariant --model_type=PACBIO \
 		--ref={input.ref} \
 		--reads={input.bam} \
