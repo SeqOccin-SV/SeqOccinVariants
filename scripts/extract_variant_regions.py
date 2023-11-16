@@ -23,12 +23,13 @@ def svlen(record):
     return max(len(record.alts[0]),len(record.ref)) - 1
 
 
-def valid_record(record):
+def valid_record(record): 
     """
     Check if the record is valid :
        A valid record must have a reference and an alternate allele entirely
        descdibed as a sequence of nucleotide (eg. not <INS>).
        The first bases of ref an alternate alleles must match
+    Returns true if valid and False otherwise
     """
     if ("<" not in record.alts[0] and
         record.alts[0][0] == record.ref[0]):
@@ -77,7 +78,7 @@ def main(vcffile, genome, outfasta, outtsv, minsize, maxsize, flankingsize, chro
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Extract SV allele sequences")
+    parser = argparse.ArgumentParser(description="Extract SV surrounding sequence")
     parser.add_argument('-v', '--vcf', required=True,
                         help='the vcf file file')
     parser.add_argument('-g', '--genome', required=True,
