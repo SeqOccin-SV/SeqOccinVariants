@@ -18,7 +18,7 @@ def eprint(*args, **kwargs):
 
 def svlen(record):
     """
-    Returns the length of a goven variant based on the size of the alleles
+    Returns the length of a given variant based on the size of the alleles
     """
     return max(len(record.alts[0]),len(record.ref)) - 1
 
